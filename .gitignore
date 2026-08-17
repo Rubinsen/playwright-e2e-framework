@@ -9,3 +9,6 @@ __pycache__/
 
 # Test data and sensitive state
 .auth/
+
+# Trace results
+test-results/

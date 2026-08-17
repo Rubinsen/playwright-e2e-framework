@@ -28,4 +28,12 @@ jobs:
       run: playwright install --with-deps
 
     - name: Run the test suite
-      run: pytest
+      run: pytest --tracing=retain-on-failure
+
+    - name: Upload Playwright Traces
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
