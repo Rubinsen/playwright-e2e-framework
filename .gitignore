@@ -1,0 +1,11 @@
+# Environments
+venv/
+env/
+
+# Cache and compiled files
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Test data and sensitive state
+.auth/
