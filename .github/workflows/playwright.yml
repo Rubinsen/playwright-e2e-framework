@@ -28,6 +28,9 @@ jobs:
       run: playwright install --with-deps
 
     - name: Run the test suite
+      env:
+        VALID_USERNAME: ${{ secrets.VALID_USERNAME }}
+        VALID_PASSWORD: ${{ secrets.VALID_PASSWORD }}
       run: pytest --html=report.html --self-contained-html --tracing=retain-on-failure
 
     - name: Upload HTML Report

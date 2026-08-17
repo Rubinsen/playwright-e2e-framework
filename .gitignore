@@ -1,6 +1,7 @@
 # Environments
 venv/
 env/
+.env
 
 # Cache and compiled files
 __pycache__/
