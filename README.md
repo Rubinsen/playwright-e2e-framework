@@ -4,19 +4,20 @@ This repository contains a production-grade UI automation framework built with P
 
 ## 🏗️ Architecture Highlights
 
+*   **Hybrid State Seeding:** Bypasses standard UI flows via direct memory/localStorage injection to instantly seed application state, drastically reducing test execution time and flakiness.
+*   **Parallel Execution:** Leverages `pytest-xdist` to distribute test execution across multiple CPU cores, optimizing compute resources for massive scalability.
+*   **Code Quality Enforcement:** Integrated Git `pre-commit` hooks and the `Ruff` linter act as localized gatekeepers, enforcing strict formatting and static analysis standards before any code reaches version control.
 *   **Page Object Model (POM):** UI interactions are strictly separated from test assertions to ensure the codebase remains maintainable and resilient to frontend changes.
-*   **Authentication State Bypass:** Leverages Playwright's browser context to capture and inject session state (`storage_state`), bypassing repetitive login flows and reducing test execution time.
-*   **Secret Management:** Environment variables are strictly managed via `python-dotenv` locally and GitHub Secrets in CI/CD, ensuring zero credentials are leaked into version control.
-*   **Network Fault Injection:** Utilizes Playwright's network interception (`page.route`) to simulate backend/CDN outages (e.g., forcing 500 Internal Server Errors) to validate frontend fault tolerance.
-*   **Data-Driven Testing:** Uses `pytest.mark.parametrize` to rigorously validate multiple edge cases and error states within a single, DRY test function.
-*   **Hermetic Execution:** Browsers and dependencies are strictly sandboxed within a virtual environment, eliminating global-state conflicts and mimicking isolated container constraints.
+*   **Authentication State Bypass:** Leverages Playwright's browser context to capture and inject session state (`storage_state`), bypassing repetitive login flows.
+*   **Secret Management:** Environment variables are strictly managed via `python-dotenv` locally and GitHub Secrets in CI/CD.
+*   **Network Fault Injection:** Utilizes Playwright's network interception (`page.route`) to simulate backend/CDN outages to validate frontend fault tolerance.
 
 ## 🚀 CI/CD & Observability
 
 This framework is fully integrated with **GitHub Actions** for continuous integration.
 
-*   **Automated Execution:** Tests run automatically on an Ubuntu Linux runner for every push and pull request to the `main` branch.
-*   **HTML Reporting:** Automatically generates and attaches a standalone `pytest-html` dashboard as a downloadable artifact for every pipeline run.
+*   **Automated Concurrent Execution:** Tests run automatically in parallel on an Ubuntu Linux runner for every push to the `main` branch.
+*   **HTML Reporting:** Automatically generates and attaches a standalone `pytest-html` dashboard as a downloadable artifact.
 *   **Trace Generation:** If a test fails in the cloud, Playwright Trace Viewer artifacts (containing DOM snapshots, network requests, and console logs) are automatically captured and uploaded for offline debugging.
 
 ## 🛠️ Tech Stack
@@ -24,13 +25,14 @@ This framework is fully integrated with **GitHub Actions** for continuous integr
 *   **Language:** Python 3
 *   **Framework:** Pytest
 *   **Automation Engine:** Playwright Sync API
-*   **Reporting:** pytest-html
+*   **Concurrency:** pytest-xdist
+*   **Linting:** Ruff & pre-commit
 
 ## 💻 Quick Start Setup
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/yourusername/playwright-e2e-framework.git](https://github.com/yourusername/playwright-e2e-framework.git)
+    git clone [https://github.com/rubinsen/playwright-e2e-framework.git](https://github.com/rubinsen/playwright-e2e-framework.git)
     cd playwright-e2e-framework
     ```
 
@@ -44,19 +46,24 @@ This framework is fully integrated with **GitHub Actions** for continuous integr
 3.  **Create and activate the virtual environment:**
     ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows use: .\venv\Scripts\activate
+    source venv/bin/activate  # Windows: .\venv\Scripts\activate
     ```
 
 4.  **Install dependencies and isolated browsers:**
     ```bash
-    pip install pytest pytest-playwright pytest-html python-dotenv
+    pip install pytest pytest-playwright pytest-html python-dotenv pytest-xdist pre-commit ruff
     
     # Windows CMD users run this first to ensure local installation:
     # set PLAYWRIGHT_BROWSERS_PATH=0
     playwright install
     ```
 
-5.  **Run the test suite with Reporting and Traces:**
+5.  **Install the Git Hooks:**
     ```bash
-    pytest --html=report.html --self-contained-html --tracing=retain-on-failure
+    pre-commit install
+    ```
+
+6.  **Run the test suite concurrently with Reporting and Traces:**
+    ```bash
+    pytest -n auto --html=report.html --self-contained-html --tracing=retain-on-failure
     ```
