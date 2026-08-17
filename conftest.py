@@ -15,7 +15,8 @@ AUTH_FILE = ".auth/state.json"
 @pytest.fixture(scope="session", autouse=True)
 def setup_auth(browser: Browser):
     """Logs in once and saves the state for all tests."""
-    # ... (Keep your existing setup code) ...
+
+    context = browser.new_context()
     
     page = context.new_page()
     page.goto("https://www.saucedemo.com/")

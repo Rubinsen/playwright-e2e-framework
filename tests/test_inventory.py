@@ -16,4 +16,4 @@ def test_bypass_login_and_view_inventory(page: Page):
     # 3. Perform assertions (Assertions stay in the test file, actions stay in the page object)
     expect(page).to_have_url(re.compile(r".*/inventory\.html"))
     expect(inventory_page.products_header).to_have_text("Products")
-    expect(inventory_page.inventory_items).to_have_count(99)
+    expect(inventory_page.inventory_items).to_have_count(6)
