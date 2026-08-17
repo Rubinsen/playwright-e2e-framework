@@ -10,7 +10,8 @@ load_dotenv()
 if not os.environ.get("CI"):
     os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 
-AUTH_FILE = ".auth/state.json"
+AUTH_DIR = ".auth"
+AUTH_FILE = os.path.join(AUTH_DIR, "state.json")
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_auth(browser: Browser):
