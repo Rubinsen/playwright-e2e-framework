@@ -1,7 +1,9 @@
 import os
-import pytest
 
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
+if not os.environ.get("CI"):
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
+
+import pytest
 from playwright.sync_api import Browser
 
 AUTH_FILE = ".auth/state.json"
