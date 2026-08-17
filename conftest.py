@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import pytest
 from playwright.sync_api import Browser, expect
 from dotenv import load_dotenv
@@ -10,18 +11,16 @@ load_dotenv()
 if not os.environ.get("CI"):
     os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 
-AUTH_DIR = ".auth"
-AUTH_FILE = os.path.join(AUTH_DIR, "state.json")
+ROOT_DIR = Path(__file__).parent
+AUTH_DIR = ROOT_DIR / ".auth"
+AUTH_FILE = AUTH_DIR / "state.json"
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_auth(browser: Browser):
     """Logs in once and saves the state for all tests."""
+    
+    AUTH_DIR.mkdir(parents=True, exist_ok=True)
 
-    context = browser.new_context()
-    
-    page = context.new_page()
-    page.goto("https://www.saucedemo.com/")
-    
     # Fetch credentials dynamically from the environment
     username = os.getenv("VALID_USERNAME")
     password = os.getenv("VALID_PASSWORD")
@@ -29,26 +28,24 @@ def setup_auth(browser: Browser):
     if not username or not password:
         raise ValueError("Missing credentials! Check your .env file or GitHub Secrets.")
 
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://www.saucedemo.com/")
+    
     page.locator("[data-test='username']").fill(username)
     page.locator("[data-test='password']").fill(password)
     page.locator("[data-test='login-button']").click()
     
-    # 3. Wait for navigation to complete
-    page.wait_for_url("https://www.saucedemo.com/inventory.html")
-    
-    # 4. Save the authenticated state
-    context.storage_state(path=AUTH_FILE)
-    
-    # Close the setup context to free up memory
+    # Ensure login is successful before saving state
+    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+
+    # Save the authenticated state and close the browser context
+    context.storage_state(path=str(AUTH_FILE))
     context.close()
 
 @pytest.fixture(scope="session")
-def browser_context_args(browser_context_args, setup_auth):
-    """
-    This fixture overrides the default pytest-playwright browser_context_args.
-    It injects the saved storage state into every test's browser context.
-    """
+def browser_context_args(browser_context_args):
     return {
         **browser_context_args,
-        "storage_state": AUTH_FILE
+        "storage_state": str(AUTH_FILE),
     }
