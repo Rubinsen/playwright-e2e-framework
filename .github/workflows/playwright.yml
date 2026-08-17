@@ -22,13 +22,21 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-playwright
+        pip install pytest pytest-playwright pytest-html
 
     - name: Ensure browsers are installed
       run: playwright install --with-deps
 
     - name: Run the test suite
-      run: pytest --tracing=retain-on-failure
+      run: pytest --html=report.html --self-contained-html --tracing=retain-on-failure
+
+    - name: Upload HTML Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-html-report
+        path: report.html
+        retention-days: 7
 
     - name: Upload Playwright Traces
       if: failure()

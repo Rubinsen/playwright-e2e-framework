@@ -12,3 +12,6 @@ __pycache__/
 
 # Trace results
 test-results/
+
+# Local report
+report.html
